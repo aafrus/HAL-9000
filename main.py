@@ -63,6 +63,21 @@ def main():
                 )
                 break  # Aktivera endast det högsta larmet
 
+    def monitoring_mode():
+        global active_monitoring
+        active_monitoring = True  # Sätta övervakningen som aktiv
+        print("Övervakning är aktiv. Tryck på Enter för att återgå till menyn.")
+
+        while active_monitoring:
+            print("Övervakning är fortfarande aktiv...")
+            time.sleep(5)  # Vänta i 5 sekunder innan nästa meddelande
+
+            if input() == "":  # Väntar på att användaren trycker Enter
+                active_monitoring = False  # Avsluta övervakning
+                print("\nÅtergår till huvudmenyn.")
+                log_event("Övervakningsläge_stoppat")
+                break  # Bryt ut ur loopen
+
     while True:
         print("\nVälj ett alternativ:")
         print("1. Starta övervakning")
@@ -142,17 +157,6 @@ def main():
         elif choice == '6':
             print("Startar övervakningsläge...")
             log_event("Övervakningsläge_startat")
-            active_monitoring = True
-
-            def monitoring_mode():
-                try:
-                    while True:
-                        print("Övervakning är aktiv, tryck på Ctrl+C för att återgå till menyn.")
-                        time.sleep(5)
-                except KeyboardInterrupt:
-                    print("\nÅtergår till huvudmenyn.")
-                    log_event("Övervakningsläge_stoppat")
-
             monitoring_thread = threading.Thread(target=monitoring_mode)
             monitoring_thread.start()
             monitoring_thread.join()
