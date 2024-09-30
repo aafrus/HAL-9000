@@ -1,4 +1,3 @@
-# main.py
 from monitor import Monitor
 from alarm import Alarm
 from logger import setup_logger, log_event
@@ -56,6 +55,8 @@ def main():
                 message = f"***VARNING, LARM AKTIVERAT, {alarm_type.upper()} ANVÄNDNING ÖVERSTIGER {threshold}%***"
                 print(message)
                 log_event(f"{alarm_type}_Användningslarm_aktiverat_{threshold}_Procent")
+
+                # Skicka e-post när ett larm aktiveras
                 send_email(
                     subject=f"Larm: {alarm_type} användning över {threshold}%",
                     content=message
