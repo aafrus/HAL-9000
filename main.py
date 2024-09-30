@@ -1,8 +1,9 @@
+# main.py
 from monitor import Monitor
 from alarm import Alarm
 from logger import setup_logger, log_event
 from utils import load_alarms, save_alarms
-from emailsender import send_email
+from email_sender import send_email
 import threading
 import time
 import sys
@@ -55,8 +56,6 @@ def main():
                 message = f"***VARNING, LARM AKTIVERAT, {alarm_type.upper()} ANVÄNDNING ÖVERSTIGER {threshold}%***"
                 print(message)
                 log_event(f"{alarm_type}_Användningslarm_aktiverat_{threshold}_Procent")
-
-                # Skicka e-post när ett larm aktiveras
                 send_email(
                     subject=f"Larm: {alarm_type} användning över {threshold}%",
                     content=message
@@ -68,15 +67,21 @@ def main():
         active_monitoring = True  # Sätta övervakningen som aktiv
         print("Övervakning är aktiv. Tryck på Enter för att återgå till menyn.")
 
-        while active_monitoring:
-            print("Övervakning är fortfarande aktiv...")
-            time.sleep(5)  # Vänta i 5 sekunder innan nästa meddelande
+        # Starta en separat tråd för att hantera statusutskriften
+        def print_status():
+            while active_monitoring:
+                print("Övervakning är fortfarande aktiv...")
+                time.sleep(5)  # Vänta i 5 sekunder innan nästa meddelande
 
-            if input() == "":  # Väntar på att användaren trycker Enter
-                active_monitoring = False  # Avsluta övervakning
-                print("\nÅtergår till huvudmenyn.")
-                log_event("Övervakningsläge_stoppat")
-                break  # Bryt ut ur loopen
+        status_thread = threading.Thread(target=print_status)
+        status_thread.start()
+
+        # Vänta på Enter för att stoppa övervakningen
+        input()  # Väntar på att användaren trycker Enter
+        active_monitoring = False  # Avsluta övervakning
+        status_thread.join()  # Vänta på att status-tråden ska avslutas
+        print("\nÅtergår till huvudmenyn.")
+        log_event("Övervakningsläge_stoppat")
 
     while True:
         print("\nVälj ett alternativ:")
@@ -167,28 +172,6 @@ def main():
             sys.exit()
         else:
             print("Fel: Ogiltigt val.")
-
-def monitoring_mode():
-    global active_monitoring
-    active_monitoring = True  # Sätta övervakningen som aktiv
-    print("Övervakning är aktiv. Tryck på Enter för att återgå till menyn.")
-
-    while active_monitoring:
-        print("Övervakning är fortfarande aktiv...")
-        time.sleep(5)  # Vänta i 5 sekunder innan nästa meddelande
-
-        # Kolla om Enter trycks
-        if input() == "":  # Väntar på att användaren trycker Enter
-            active_monitoring = False  # Avsluta övervakning
-            print("\nÅtergår till huvudmenyn.")
-            log_event("Övervakningsläge_stoppat")
-            break  # Bryt ut ur loopen
-
-# Användning i menyn
-monitoring_thread = threading.Thread(target=monitoring_mode)
-monitoring_thread.start()
-monitoring_thread.join()
-
 
 if __name__ == "__main__":
     main()
