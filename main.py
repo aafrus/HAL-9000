@@ -3,7 +3,7 @@ from monitor import Monitor
 from alarm import Alarm
 from logger import setup_logger, log_event
 from utils import load_alarms, save_alarms
-from email_sender import send_email
+from emailsender import send_email
 import threading
 import time
 import sys
