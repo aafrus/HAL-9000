@@ -1,36 +1,45 @@
-# sysinfo.py
-import psutil
-import platform
-import shutil
-import time
+#interface.py
 import os
+import time
 
-class SysInfoDisplay:
-    def __init__(self):
-        self.clear_screen()
+# ANSI color codes
+RED = "\033[31m"
+GREEN = "\033[32m"
+YELLOW = "\033[33m"
+BLUE = "\033[34m"
+CYAN = "\033[36m"
+WHITE = "\033[37m"
+RESET = "\033[0m"
+BOLD = "\033[1m"
+GRAY = "\033[90m"
+FULL = "─"
+EMPTY = "┄"
 
-    def clear_screen(self):
-        os.system('cls' if platform.system() == 'Windows' else 'clear')
+def draw_progress(perc, size, color):
+    inc = int(perc * size / 100)
+    bar = (FULL * inc).ljust(size, EMPTY)
+    return f"{color}{bar}{RESET}"
 
-    def format_bar(self, value, total=100, size=20, bar_char="█", empty_char=" "):
-        filled = int(size * value / total)
-        return bar_char * filled + empty_char * (size - filled)
+def get_cpu_usage():
+    # Simulating CPU usage for the example
+    return os.getloadavg()[0] * 10  # Convert loadavg to percentage
 
-    def display_info(self):
-        cpu_percent = psutil.cpu_percent(interval=1)
-        mem = psutil.virtual_memory()
-        disk = psutil.disk_usage('/')
-        
-        # Draw system info
-        print(f"User: {os.getlogin()}")
-        print(f"System: {platform.system()} {platform.release()}")
-        print(f"CPU Usage: {cpu_percent}%")
-        print(f"Memory Usage: {mem.percent}% ({mem.used // (1024 ** 2)} MB used)")
-        print(f"Disk Usage: {disk.percent}% ({disk.used // (1024 ** 3)} GB used)")
+def get_memory_usage():
+    # Simulate memory usage in percentage
+    total_memory = 8000  # Example total memory in MB
+    used_memory = 4000  # Example used memory in MB
+    return int(used_memory / total_memory * 100)
 
-        print("\nResource Usage Bars:")
-        print(f"CPU  [{self.format_bar(cpu_percent)}] {cpu_percent}%")
-        print(f"RAM  [{self.format_bar(mem.percent)}] {mem.percent}%")
-        print(f"Disk [{self.format_bar(disk.percent)}] {disk.percent}%")
+def display_info():
+    cpu_usage = get_cpu_usage()
+    mem_usage = get_memory_usage()
 
-        input("\nPress any key to return to menu...")
+    print(f"{YELLOW}  HAL-9000 System Monitor{RESET}")
+    print(f"{BLUE}  CPU Usage:  {cpu_usage}% {draw_progress(cpu_usage, 15, RED)}")
+    print(f"{BLUE}  Memory Usage: {mem_usage}% {draw_progress(mem_usage, 15, GREEN)}")
+
+if __name__ == "__main__":
+    while True:
+        os.system('clear')  # Clear the terminal
+        display_info()
+        time.sleep(5)  # Refresh every 5 seconds

@@ -175,3 +175,25 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# main.py
+from interface import draw_header, display_cpu_ram, colored_text
+
+def main():
+    name = "YourUsername"
+    host = "YourHost"
+    uptime = "1h 2m"
+    cpu_usage = 75  # Example CPU usage
+    ram_usage = 65  # Example RAM usage
+
+    # Display header
+    header = draw_header(name, host, uptime)
+    print(header)
+
+    # Display CPU and RAM usage
+    usage_display = display_cpu_ram(cpu_usage, ram_usage)
+    print(usage_display)
+
+if __name__ == "__main__":
+    main()
+    
