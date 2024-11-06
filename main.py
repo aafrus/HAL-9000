@@ -14,11 +14,27 @@ Components:
     - Logger: Event logging
 """
 
+import sys
+import subprocess
+
+#Checks Windows
+if sys.platform == "win32":
+    try:
+        import curses
+    except ImportError:
+        print("Försöker installera windows-curses...")
+        try:
+            # Försök att installera windows-curses om det saknas
+            subprocess.check_call([sys.executable, "-m", "pip", "install", "windows-curses"])
+            import curses  # Försök att importera curses igen efter installation
+        except subprocess.CalledProcessError as e:
+            print(f"Misslyckades att installera windows-curses: {e}")
+            sys.exit(1)
+
 from gui import GUI
 from monitoring import MonitoringSystem
 from alarm_manager import AlarmManager
 from logging_app import Logger
-
 
 def main() -> None:
     """Initialize and run the monitoring application.
